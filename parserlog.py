@@ -7,6 +7,7 @@ import traceback
 import re
 import config
 import sender
+from configfile import Config
 
 my_name = os.path.splitext(os.path.basename(__file__))[0]
 pid = "pid = " + str(os.getpid()) + ", sender = " + my_name
@@ -436,8 +437,13 @@ class parser(object):
             
     def runA(self):
         try:
-            f = self.dataconf.setting[0].datalog
-            f_time = self.dataconf.setting[0].roundtime
+            #f = self.dataconf.setting[0].datalog
+            #f_time = self.dataconf.setting[0].roundtime
+            cdir = os.path.dirname(__file__)
+            os.chdir(cdir)
+            cfg = Config('conf.ini')
+            f = cfg.setting[0].datalog
+            f_time = cfg.setting[0].roundtime
             try:
                 data = open(f).readlines()
             except:
@@ -447,7 +453,7 @@ class parser(object):
                 if len(data) > 0:
                     print "len f = ", len(data)
                     print "ADA 1" 
-                    sender.main("Totalcmd Log Monitor : Processing Data Log !")
+                    #sender.main("Totalcmd Log Monitor : Processing Data Log !")
                     self.parserlog(f)
                     time.sleep(int(f_time))
                     self.runB()
@@ -470,8 +476,13 @@ class parser(object):
     def runB(self):
         #sender.main("Totalcmd Log Monitor : Processing Data Log !")
         try:
-            f = self.dataconf.setting[0].datalog
-            f_time = self.dataconf.setting[0].roundtime
+            cdir = os.path.dirname(__file__)
+            os.chdir(cdir)
+            cfg = Config('conf.ini')
+            f = cfg.setting[0].datalog
+            #f = self.dataconf().setting[0].datalog
+            #f_time = self.dataconf.setting[0].roundtime
+            f_time = cfg.setting[0].roundtime
             try:
                 data = open(f).readlines()
             except:
@@ -517,9 +528,16 @@ class parser(object):
 
 
 if __name__ == "__main__":
+    fp = config.read_config()
+    f = fp.setting[0].datalog
+    #print f
     myapp = parser()
-    #myapp.parserlog()
-    myapp.runA()
-    #myapp.test2()
-    #myapp.runA()
-    #myapp.apache_state("apache2.2")
+    if len(f) > 0:
+        sender.main("Totalcmd Log Monitor : Processing Data Log !")    
+        myapp.runA()
+        #myapp.test2()
+        #myapp.runA()
+        #myapp.apache_state("apache2.2")
+    else:
+        myapp.runA()
+    

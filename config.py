@@ -1,5 +1,5 @@
 import os
-from conffile import Config
+from configfile import Config
 
 default_time = '3'  # in seconds
 TEMP = os.getenv('TEMP')
@@ -7,9 +7,9 @@ TMP = os.getenv('TMP')
 
 #parent_dir = os.path.join(str(__file__).split('system')[0], 'system')
 #this_temp = os.path.join(parent_dir,'temp')
-os.environ.update({'APACHELOG':os.path.dirname(__file__)})
+os.environ.update({'TOTALCMDLOG':os.path.dirname(__file__)})
 
-f = os.path.join(os.environ.get('APACHELOG'), 'conf.ini')
+f = os.path.join(os.environ.get('TOTALCMDLOG'), 'conf.ini')
 
 cfg = Config(f)
 

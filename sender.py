@@ -19,10 +19,11 @@ class Sender(QtGui.QDialog):
 
     def broadcastDatagramm(self):
         self.udpSocket.writeDatagram(self.msg, QtNetwork.QHostAddress(QtNetwork.QHostAddress.Broadcast), int(self.dataconf.setting[0].port))
+        self.udpSocket.close()
 
 def main(msg):
         app = QtGui.QApplication(sys.argv)
         sender = Sender(msg)
         
-#if __name__ == '__main__':
- #   main(sys.argv[1])
+if __name__ == '__main__':
+    main(sys.argv[1])
