@@ -8,7 +8,7 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt4 import QtCore, QtGui
-import config
+import configset
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -199,11 +199,11 @@ class Config_Form(QtGui.QMainWindow):
             data.append('0')
         """
         print "data = ", data
-        config.write_config(data)
+        configset.write_config(data)
         self.hide()
         
     def read_config(self):
-        data = config.read_config()
+        data = configset.read_config()
         self.lineEdit.setText(str(data.setting[0].roundtime))
         self.textEdit_table.setText(str(data.setting[0].table))
         self.textEdit_datalog.setText(str(data.setting[0].datalog))
@@ -223,7 +223,7 @@ class Config_Form(QtGui.QMainWindow):
         #import sys
         #sys.exit()
 
-
+"""
 if __name__ == "__main__":
     import sys
     app = QtGui.QApplication(sys.argv)
@@ -232,4 +232,4 @@ if __name__ == "__main__":
     #ui.setupUi(self)
     ui.show()
     sys.exit(app.exec_())
-
+"""

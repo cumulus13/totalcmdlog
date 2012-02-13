@@ -1,5 +1,6 @@
 import os
-from configfile import Config
+#from configfile import Config
+import configfile
 
 default_time = '3'  # in seconds
 TEMP = os.getenv('TEMP')
@@ -10,9 +11,9 @@ TMP = os.getenv('TMP')
 os.environ.update({'TOTALCMDLOG':os.path.dirname(__file__)})
 
 f = os.path.join(os.environ.get('TOTALCMDLOG'), 'conf.ini')
-
-cfg = Config(f)
-
+#print "F = ", f
+cfg = configfile.Config(f)
+#print "cfg = ", cfg
 #parent_dir_pre = str(__file__).split('system')[0]
 #print this_temp
 
@@ -70,7 +71,7 @@ def write_config(data):
     out.close()
     
 def read_config():
-    #print cfg.setting[0].show_error_log_detail
+    #print cfg.setting[0]
     return cfg
 
 #print read_config()

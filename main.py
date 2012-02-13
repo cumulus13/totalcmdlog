@@ -2,7 +2,7 @@ import sys
 import os
 from PyQt4 import QtCore, QtGui, QtNetwork
 import parserlog
-import config
+import configset
 import conf_form
 import time
 import traceback
@@ -19,21 +19,21 @@ class Window(QtGui.QWidget):
     def __init__(self):
         QtGui.QWidget.__init__(self)
         self._parser = parserlog.parser()
-        self.dataconf = config.read_config()
+        self.dataconf = configset.read_config()
         self.udpSocket = QtNetwork.QUdpSocket(self)
         self.statusText = "Stop"
-        
+
         self.sqlA = '''CREATE TABLE IF NOT EXISTS [datatemp](
                        [id] BIGINT(100) NOT NULL PRIMARY KEY,
                        [pid] VARCHAR(255) NOT NULL,
                        [name] VARCHAR(255) NOT NULL,
                        [addinfo] VARCHAR(255) NOT NULL)'''
-        
+
         #self.conn = sqlite.connect(os.environ['TEMP'] + '\\' + 'dtemp.db')
         self.conn = sqlite.connect('dtemp.db')
         self.curs = self.conn.cursor()
         self.process = QtCore.QProcess()
-        
+
         #self.createIconGroupBox()
         #self.createMessageGroupBox()
 
@@ -197,7 +197,7 @@ class Window(QtGui.QWidget):
         #                       QtCore.SIGNAL("triggered()"), self,
         #                       QtCore.SLOT("self.test"))
         self.runAction.connect(self.runAction, QtCore.SIGNAL("triggered()"), self.start_server)
-                               
+
 
         self.stopAction = QtGui.QAction(self.tr("&Stop"), self)
         self.stopAction.setIcon(QtGui.QIcon('images/stop.png'))
@@ -205,7 +205,7 @@ class Window(QtGui.QWidget):
         #QtCore.QObject.connect(self.stopAction,
         #                       QtCore.SIGNAL("triggered()"), self,
         #                       QtCore.SLOT("stop()"))
-        
+
         self.quitAction = QtGui.QAction(self.tr("&Quit"), self)
         self.quitAction.setIcon(QtGui.QIcon('images/quick.png'))
         self.quitAction.connect(self.quitAction, QtCore.SIGNAL("triggered()"), self.quit)
@@ -216,8 +216,8 @@ class Window(QtGui.QWidget):
         self.status.setIcon(QtGui.QIcon('images/status.png'))
         self.status.connect(self.status, QtCore.SIGNAL("triggered()"), self._status)
         #QtCore.QObject.connect(self.status,
-         #                      QtCore.SIGNAL("triggered()"), self, QtCore.SLOT("status()") )
-        
+            #                      QtCore.SIGNAL("triggered()"), self, QtCore.SLOT("status()") )
+
         self.confAction = QtGui.QAction(self.tr("Config"), self)
         self.confAction.setIcon(QtGui.QIcon('images/config.png'))
         #QtCore.QObject.connect(self.confAction,
@@ -248,8 +248,9 @@ class Window(QtGui.QWidget):
         except:
             print "Error = ", str(traceback.format_exc())
             self._showMsg(str(traceback.format_exc()))
+            self.statusText == "Stopped Error"
             pass
-            
+
     def getmax_id(self):
         try:
             sql = "SELECT count(id) FROM datatemp"
@@ -261,19 +262,19 @@ class Window(QtGui.QWidget):
             sql = "SELECT count(id) FROM datatemp"
             self.curs.execute(sql)
             self.conn.commit()
-            
+
     def processPendingDatagrams(self):
         try:
             while self.udpSocket.hasPendingDatagrams():
                 datagram, host, port = self.udpSocket.readDatagram(self.udpSocket.pendingDatagramSize())
-    
+
                 try:
                     # Python v3.
                     datagram = str(datagram, encoding='ascii')
                 except TypeError:
                     # Python v2.
                     pass
-    
+
                 #self.statusLabel.setText("Received datagram: \"%s\"" % datagram)
                 self._showMsg(datagram)
                 if "pid = " in datagram:
@@ -299,7 +300,7 @@ class Window(QtGui.QWidget):
                     self.conn.commit()
                     self.curs.execute(SQL)
                     self.conn.commit()
-                    
+
                 return datagram
         except:
             datae = traceback.format_exc()
@@ -324,7 +325,7 @@ class Window(QtGui.QWidget):
             self._showMsg(msg)
             #sys.exit()
             self.runB()
-        
+
     def runB(self):
         f = self.dataconf.setting[0].errorlog
         f_time = self.dataconf.setting[0].roundtime
@@ -339,7 +340,7 @@ class Window(QtGui.QWidget):
     """        
     def runC(self):
         os.startfile("parserlog.pyw")
-        
+
     def stop(self):
         try:
             try:
@@ -364,19 +365,24 @@ class Window(QtGui.QWidget):
             print "Error Script = ", msg
             #pass
             return
-            
+
     def start(self):
         a = subprocess.Popen(r'c:\Python26\python.exe ' + ' ' + str(os.path.join(os.getcwd(), 'apachelogparser.py')))
         self._showMsg(str(a.pid))
         return a.pid
-    
+
     def _status(self):
-        msg = "Server is " + self.statusText
+        SQL = "SELECT pid FROM datatemp WHERE name = 'parserlog' "
+        self.curs.execute(SQL)
+        self.conn.commit()
+        data = self.curs.fetchall()
+        pid = int((data[0][0]))
+        msg = "Server is " + self.statusText + "\n" + "PID = " + str(pid)
         self._showMsg(msg)
-    
+
     def stoplite(self):
         pass
-    
+
     def startCommand(self):
         try:
             self.process.start(r"c:\Python26\python.exe", QtCore.QStringList(["parserlog.py"]))
@@ -384,7 +390,7 @@ class Window(QtGui.QWidget):
             #return self.process.pid()
         except:
             self._showMsg(QtGui.QString(self.process.readLineStderr()))
-            
+
     def stopCommand(self):
         try:
             self.process.start(r"c:\Python26\python.exe", QtCore.QStringList(["parserlog.py"]))
@@ -392,31 +398,31 @@ class Window(QtGui.QWidget):
             return self.process.pid()
         except:
             self._showMsg(QtGui.QString(self.process.readLineStderr()))
-    
-            
+
+
     def show_config(self):
         conf_win = conf_form.Config_Form(self)
         conf_win.show()
-        
+
     def _showMsg(self,msg,tmsg='info'):
         print msg
         icon = self.trayIcon.MessageIcon(self.trayIcon.Information)
         self.trayIcon.showMessage('Info',str(msg), icon, 3000)
-        
+
     def quit(self):
         self.stop()
         sys.exit()
-    
+
     def logout(self):
         sql0 = '''DROP TABLE IF EXISTS datatemp'''
         self.curs.execute(sql0)
         self.conn.commit()
-        
+
     def test(self):
         print "hello gays 1 \n"
-      
+
     #show_config
-        
+
 if __name__=='__main__':
     app = QtGui.QApplication(sys.argv)
 
