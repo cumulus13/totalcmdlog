@@ -300,6 +300,30 @@ class Window(QtGui.QWidget):
                     self.conn.commit()
                     self.curs.execute(SQL)
                     self.conn.commit()
+                elif "IOError" in datagram:
+                    self.statusText = "Restart Server  ....."
+                    try:
+                        self.stop()
+                    except:
+                        pass
+                    self.start_server()
+                    self._showMsg("Restart Server .....")
+                elif "OperationalError" in datagram:
+                    self.statusText = "Restart Server  ....."
+                    try:
+                        self.stop()
+                    except:
+                        pass
+                    self.start_server()
+                    self._showMsg("Restart Server .....")
+                elif "SystemExit" in datagram:
+                    self.statusText = "Restart Server  ....."
+                    try:
+                        self.stop()
+                    except:
+                        pass
+                    self.start_server()
+                    self._showMsg("Restart Server .....")
 
                 return datagram
         except:
