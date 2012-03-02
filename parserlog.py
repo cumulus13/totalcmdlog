@@ -159,25 +159,32 @@ class parser(object):
     def parserlog(self, f=None):
         IP_SYSLOG_SERVER = '127.0.0.1'
         PORT_SYSLOG_SERVER = 514
-        if f != None:
-            if os.path.isfile(f):
-                filename = f
+        try:
+            if f != None:
+                if os.path.isfile(f):
+                    filename = f
+                else:
+                    datae = traceback.format_exc()
+                    msg = str(os.path.splitext(os.path.basename(str(__file__)))[0]) + " File Log Not Found; " + str(datae)
+                    syslog.syslog(msg, 3,3,host,514)
+                    sender.main(msg)
+                    return
+                
             else:
-                datae = traceback.format_exc()
-                msg = str(os.path.splitext(os.path.basename(str(__file__)))[0]) + " File Log Not Found; " + str(datae)
-                syslog.syslog(msg, 3,3,host,514)
-                sender.main(msg)
-                return
-            
-        else:
-            if os.path.isfile(filenamelog):
-                filename = filenamelog
-            else:
-                datae = traceback.format_exc()
-                msg = str(os.path.splitext(os.path.basename(str(__file__)))[0]) + " File Log Not Found; " + str(datae)
-                syslog.syslog(msg, 3,3,host,514)
-                sender.main(msg)
-                return
+                if os.path.isfile(filenamelog):
+                    filename = filenamelog
+                else:
+                    datae = traceback.format_exc()
+                    msg = str(os.path.splitext(os.path.basename(str(__file__)))[0]) + " File Log Not Found; " + str(datae)
+                    syslog.syslog(msg, 3,3,host,514)
+                    sender.main(msg)
+                    return
+        except:
+            datae = "ERROR : " + str(i) + ". " + str(data[i])  + "; Traceback = " + str(traceback.format_exc())
+            syslog.syslog(str(datae), 3,11,host,514)
+            sender.main(str(datae))
+            print datae
+            return
            
         try:
             if (os.path.isfile(filename) == True):
@@ -267,10 +274,11 @@ class parser(object):
                         pass
                     #print "action = ", DAction
                     #print "message = ", DMessage
+                    DMessage2 = str(DMessage).replace("\\","/")
                     databank = []
                     databank.append(DDate)
                     databank.append(DAction)
-                    databank.append(DMessage)
+                    databank.append(DMessage2)
                     #print "DATA BANK = ", databank
                     self._toDb(databank,'general')
 
@@ -300,25 +308,32 @@ class parser(object):
     def parserlog_ftp(self, f=None):
         IP_SYSLOG_SERVER = '127.0.0.1'
         PORT_SYSLOG_SERVER = 514
-        if f != None:
-            if os.path.isfile(f):
-                filename = f
+        try:
+            if f != None:
+                if os.path.isfile(f):
+                    filename = f
+                else:
+                    datae = traceback.format_exc()
+                    msg = str(os.path.splitext(os.path.basename(str(__file__)))[0]) + " File Log Not Found; " + str(datae)
+                    syslog.syslog(msg, 3,3,host,514)
+                    sender.main(msg)
+                    return
+                
             else:
-                datae = traceback.format_exc()
-                msg = str(os.path.splitext(os.path.basename(str(__file__)))[0]) + " File Log Not Found; " + str(datae)
-                syslog.syslog(msg, 3,3,host,514)
-                sender.main(msg)
-                return
-            
-        else:
-            if os.path.isfile(filenamelog):
-                filename = ftplog
-            else:
-                datae = traceback.format_exc()
-                msg = str(os.path.splitext(os.path.basename(str(__file__)))[0]) + " File Log Not Found; " + str(datae)
-                syslog.syslog(msg, 3,3,host,514)
-                sender.main(msg)
-                return
+                if os.path.isfile(filenamelog):
+                    filename = ftplog
+                else:
+                    datae = traceback.format_exc()
+                    msg = str(os.path.splitext(os.path.basename(str(__file__)))[0]) + " File Log Not Found; " + str(datae)
+                    syslog.syslog(msg, 3,3,host,514)
+                    sender.main(msg)
+                    return
+        except:
+            datae = "ERROR : " + str(i) + ". " + str(data[i])  + "; Traceback = " + str(traceback.format_exc())
+            syslog.syslog(str(datae), 3,11,host,514)
+            sender.main(str(datae))
+            print datae
+            return
         try:
             if (os.path.isfile(filename) == True):
                 while self.cekfile(filename) == False:
@@ -401,6 +416,8 @@ class parser(object):
                     #print str(i) + ". |" + "_" * 100
                     if '"' in Dmessage:
                         Dmessage = str(Dmessage).replace('"', "'")
+                    else:
+                        Dmessage = str(Dmessage).replace("\\","/")
                     databank2 = []
                     databank2.append(DDate)
                     databank2.append(DFacility)
