@@ -10,6 +10,7 @@ import configset
 import sender
 from pysqlite2 import dbapi2 as sqlite
 from configfile import Config
+import warnings
 
 my_name = os.path.splitext(os.path.basename(__file__))[0]
 pid = "pid = " + str(os.getpid()) + ", sender = " + my_name
@@ -34,19 +35,35 @@ passwd = filedata.setting[0].password
 db = filedata.setting[0].database
 table = filedata.setting[0].table
 tableftp = filedata.setting[0].tableftp
-conn = MySQLdb.connect(host,user,passwd,db)
+
+IP_SYSLOG_SERVER = filedata.setting[0].sysloghost
+PORT_SYSLOG_SERVER = int(filedata.setting[0].syslogport)
+
+SQL_DB_CREATE = "CREATE DATABASE IF NOT EXISTS {0};".format(db)
+
+try:
+    conn = MySQLdb.connect(host,user,passwd, db)
+    cursor = conn.cursor()
+except:
+    conn = MySQLdb.connect(host,user,passwd)
+    cursor = conn.cursor()
+    cursor.execute(SQL_DB_CREATE)    
+    conn.commit()
+
+conn = MySQLdb.connect(host,user,passwd, db)
 cursor = conn.cursor()
 
-IP_SYSLOG_SERVER = '127.0.0.1'
-PORT_SYSLOG_SERVER = 514
+# IP_SYSLOG_SERVER = '127.0.0.1'
+# PORT_SYSLOG_SERVER = 514
 
-conn2 = sqlite.connect('dtemp.db')
+conn2 = sqlite.connect('totalcmd_dtemp.db')
 curs = conn2.cursor()
 
 class parser(object):
-    def __init__(self,parent=None):
+    def __init__(self,parent=None, verbosity=None, debug=None):
         super(parser, self).__init__()
-        #host = '127.0.0.1'
+        self.verbosity = verbosity
+        self.debug = debug
         
     def getdatetime_now(self):
         dt = datetime.datetime.now()
@@ -88,8 +105,10 @@ class parser(object):
                     sender.main(msg)
                     raise LookupError
                 try:
-                    cursor.execute(SQL1)
-                    conn.commit()
+                    with warnings.catch_warnings():
+                        warnings.simplefilter('ignore')
+                        cursor.execute(SQL1)
+                        conn.commit()
                 except:
                     pass
                 cursor.execute(SQL2)
@@ -98,17 +117,18 @@ class parser(object):
             except:
                 datae = traceback.format_exc()
                 msg = str(os.path.splitext(os.path.basename(str(__file__)))[0]) + " " + str(datae)
-                syslog.syslog(msg, 3,3,host,514)
+                syslog.syslog(msg, 3,3,IP_SYSLOG_SERVER,PORT_SYSLOG_SERVER)
                 sender.main(msg)
-                print "Error Script = ", msg
-                print " Error = ", datae
-                #print "SQL1 = ", SQL1
-                #print "SQL2 = ", SQL2
-                print "DDate  = ", data[0]
-                print "Facilty  = ", data[1]
-                print "Text  = ", data[2]
-                print "_" * 190
-                #pass
+                if self.verbosity:
+                    print "Error Script = ", msg
+                    print " Error = ", datae
+                    #print "SQL1 = ", SQL1
+                    #print "SQL2 = ", SQL2
+                    print "DDate  = ", data[0]
+                    print "Facilty  = ", data[1]
+                    print "Text  = ", data[2]
+                    print "_" * 190
+                    #pass
                 sys.exit()
         elif type == "ftp":
             try:
@@ -131,34 +151,36 @@ class parser(object):
             except:
                 datae = traceback.format_exc()
                 msg = str(os.path.splitext(os.path.basename(str(__file__)))[0]) + " " + str(datae)
-                syslog.syslog(msg, 3,3,host,514)
+                syslog.syslog(msg, 3,3,IP_SYSLOG_SERVER,PORT_SYSLOG_SERVER)
                 sender.main(msg)
-                print "Error Script = ", msg
-                print " Error = ", datae
-                #print "SQL1 = ", SQL1
-                #print "SQL2 = ", SQL2
-                print "DDate  = ", data[0]
-                print "Facilty  = ", data[1]
-                print "Text  = ", data[2]
-                print "_" * 190
-                #pass
+                if self.verbosity:
+                    print "Error Script = ", msg
+                    print " Error = ", datae
+                    #print "SQL1 = ", SQL1
+                    #print "SQL2 = ", SQL2
+                    print "DDate  = ", data[0]
+                    print "Facilty  = ", data[1]
+                    print "Text  = ", data[2]
+                    print "_" * 190
+                    #pass
                 sys.exit()
         else:
-            datae = "Format Data is inValis ! \n"
+            datae = "Format Data is inValid ! \n"
             msg = str(os.path.splitext(os.path.basename(str(__file__)))[0]) + " " + str(datae)
-            syslog.syslog(msg, 3,3,host,514)
+            syslog.syslog(msg, 3,3,IP_SYSLOG_SERVER,PORT_SYSLOG_SERVER)
             sender.main(msg)
-            print "Error Script = ", msg
-            print "_" * 190
-            #pass
+            if self.verbosity:
+                print "Error Script = ", msg
+                print "_" * 190
+                #pass
             sys.exit()  
 
 
 
 
     def parserlog(self, f=None):
-        IP_SYSLOG_SERVER = '127.0.0.1'
-        PORT_SYSLOG_SERVER = 514
+        # IP_SYSLOG_SERVER = '127.0.0.1'
+        # PORT_SYSLOG_SERVER = 514
         try:
             if f != None:
                 if os.path.isfile(f):
@@ -166,7 +188,7 @@ class parser(object):
                 else:
                     datae = traceback.format_exc()
                     msg = str(os.path.splitext(os.path.basename(str(__file__)))[0]) + " File Log Not Found; " + str(datae)
-                    syslog.syslog(msg, 3,3,host,514)
+                    syslog.syslog(msg, 3,3,IP_SYSLOG_SERVER,PORT_SYSLOG_SERVER)
                     sender.main(msg)
                     return
                 
@@ -176,14 +198,16 @@ class parser(object):
                 else:
                     datae = traceback.format_exc()
                     msg = str(os.path.splitext(os.path.basename(str(__file__)))[0]) + " File Log Not Found; " + str(datae)
-                    syslog.syslog(msg, 3,3,host,514)
+                    syslog.syslog(msg, 3,3,IP_SYSLOG_SERVER,PORT_SYSLOG_SERVER)
                     sender.main(msg)
                     return
         except:
             datae = "ERROR : " + str(i) + ". " + str(data[i])  + "; Traceback = " + str(traceback.format_exc())
-            syslog.syslog(str(datae), 3,11,host,514)
+            # syslog.syslog(str(datae), 3,11,host,514)
+            syslog.syslog(str(datae), 3,11,IP_SYSLOG_SERVER,PORT_SYSLOG_SERVER)
             sender.main(str(datae))
-            print datae
+            if self.verbosity:
+                print datae
             return
            
         try:
@@ -211,7 +235,8 @@ class parser(object):
                     #print i
                     data_pre = re.split(': ', data[i])
                     #print "len(data_pre) = ", len(data_pre)
-                    print data_pre
+                    if self.debug:
+                        print data_pre
                     if "a" in data_pre[0]:
                         DDate_pre = re.split('a',data_pre[0])[0]
                     elif "p" in data_pre[0]:
@@ -288,12 +313,14 @@ class parser(object):
                 #sys.exit()
         
         except:
-            print "\n"
-            print "ERROR : "
             datae = traceback.format_exc()
-            syslog.syslog(str(datae), 3,3,host,514)
+            # syslog.syslog(str(datae), 3,3,host,514)
+            syslog.syslog(str(datae), 3,3,IP_SYSLOG_SERVER,PORT_SYSLOG_SERVER)
             sender.main(str(datae))
-            print datae
+            if self.verbosity:
+                print "\n"
+                print "ERROR : "
+                print datae
             pass
         
         try:
@@ -301,13 +328,14 @@ class parser(object):
             df.close()
         except:
             datae = traceback.format_exc()
-            syslog.syslog(str(datae), 3,3,host,514)
+            # syslog.syslog(str(datae), 3,3,host,514)
+            syslog.syslog(str(datae), 3,3,IP_SYSLOG_SERVER,PORT_SYSLOG_SERVER)
             sender.main(str(datae))
             pass
 
     def parserlog_ftp(self, f=None):
-        IP_SYSLOG_SERVER = '127.0.0.1'
-        PORT_SYSLOG_SERVER = 514
+        # IP_SYSLOG_SERVER = '127.0.0.1'
+        # PORT_SYSLOG_SERVER = 514
         try:
             if f != None:
                 if os.path.isfile(f):
@@ -315,7 +343,8 @@ class parser(object):
                 else:
                     datae = traceback.format_exc()
                     msg = str(os.path.splitext(os.path.basename(str(__file__)))[0]) + " File Log Not Found; " + str(datae)
-                    syslog.syslog(msg, 3,3,host,514)
+                    # syslog.syslog(msg, 3,3,host,514)
+                    syslog.syslog(msg, 3,3,IP_SYSLOG_SERVER,PORT_SYSLOG_SERVER)
                     sender.main(msg)
                     return
                 
@@ -330,9 +359,11 @@ class parser(object):
                     return
         except:
             datae = "ERROR : " + str(i) + ". " + str(data[i])  + "; Traceback = " + str(traceback.format_exc())
-            syslog.syslog(str(datae), 3,11,host,514)
+            # syslog.syslog(str(datae), 3,11,host,514)
+            syslog.syslog(str(datae), 3,11,IP_SYSLOG_SERVER,PORT_SYSLOG_SERVER)
             sender.main(str(datae))
-            print datae
+            if self.verbosity:
+                print datae
             return
         try:
             if (os.path.isfile(filename) == True):
@@ -391,7 +422,8 @@ class parser(object):
                             if " PM" in datapre[1] or " AM" in datapre[1]:
                                 datapre_date = datapre[1]
                                 DDate = self.formatdate_ftp(re.split("\(|\)", datapre_date)[1])
-                                print "DDATE A = ", DDate
+                                if self.verbosity:
+                                    print "DDATE A = ", DDate
                                 break
                             else:
                                 if "ftp" in datapre[1]:
@@ -399,7 +431,8 @@ class parser(object):
                                     #Dmessage = str(" ").join(data_pre[1:]).strip()
                                     DFacility = str(datapre_facility[0]).strip()
                                     DDate = self.formatdate_ftp(str(" ").join(datapre_facility[2:5]).strip())
-                                    print "DDATE B = ", datapre 
+                                    if self.verbosity:
+                                        print "DDATE B = ", datapre 
                                     break
                                 else:
                                     DDate = self.getdatetime_now()
@@ -431,15 +464,17 @@ class parser(object):
                     self._toDb(databank2, "ftp")
         except:
             #print "DDate          = ", DDate
-            print "DFacility      = ", DFacility
-            print "DMessage   = ", Dmessage
-            print str(i) + ". |" + "_" * 100
-            print "\n"
-            print "ERROR : "
+            if self.verbosity:
+                print "DFacility      = ", DFacility
+                print "DMessage   = ", Dmessage
+                print str(i) + ". |" + "_" * 100
+                print "\n"
+                print "ERROR : "
             datae = "ERROR : " + str(i) + ". " + str(data[i])  + "; Traceback = " + str(traceback.format_exc())
             syslog.syslog(str(datae), 3,11,host,514)
             sender.main(str(datae))
-            print datae
+            if self.verbosity:
+                print datae
             pass
         
         try:
@@ -462,7 +497,8 @@ class parser(object):
             curs.execute(SQL)
             conn2.commit()
             data = curs.fetchall()
-            print "data 0 ", data
+            if self.verbosity:
+                print "data 0 ", data
             pid = int((data[0][0]))
             datax = os.popen("tasklist ").readlines()
             #dataz = re.split(str(pid), datax)
@@ -471,7 +507,9 @@ class parser(object):
             #print "datax = ", dataz
         except:
             datae = traceback.format_exc()
-            print "ERROR = ", str(datae)
+            syslog.syslog(str(datae), 3,3, IP_SYSLOG_SERVER, PORT_SYSLOG_SERVER)
+            if self.verbosity:
+                print "ERROR = ", str(datae)
         
     def run1(self,f=None):
         try:
@@ -488,10 +526,12 @@ class parser(object):
                         
                     if len(filelog) > 0:
                         self.parserlog(f)
-                        print "ADA 1"
+                        if self.verbosity:
+                            print "ADA 1"
                         time.sleep(int(round_time))
                     else:
-                        print "TIDAK ADA 1"
+                        if self.verbosity:
+                            print "TIDAK ADA 1"
                         time.sleep(int(round_time))
             else:
                 while 1:
@@ -504,17 +544,21 @@ class parser(object):
 
                     if len(filelog) > 0:
                         self.parserlog(f)
-                        print "ADA 2"
+                        if self.verbosity:
+                            print "ADA 2"
                         time.sleep(int(round_time))
                     else:
-                        print "TIDAK ADA 2"
+                        if self.verbosity:
+                            print "TIDAK ADA 2"
                         time.sleep(int(round_time))
         except:
             datae = traceback.format_exc()
             msg = str(os.path.splitext(os.path.basename(str(__file__)))[0]) + " " + str(datae)
-            syslog.syslog(msg, 3,3,host,514)
+            # syslog.syslog(msg, 3,3,host,514)
+            syslog.syslog(msg, 3,3,IP_SYSLOG_SERVER,PORT_SYSLOG_SERVER)
             sender.main(msg)
-            print "Error Script = ", msg
+            if self.verbosity:
+                print "Error Script = ", msg
             pass  
 
 
@@ -534,30 +578,36 @@ class parser(object):
                         if os.path.isfile(f2):
                             filelog2 = open(f2).readlines()
                             if len(filelog1) > 0 and len(filelog2) > 0:
-                                print "ADA 1"
+                                if self.verbosity:
+                                    print "ADA 1"
                                 self.parserlog(f1)
                                 self.parserlog_ftp(f2)
                                 time.sleep(int(roundtime))
                             elif len(filelog1) > 0 and len(filelog2) < 2:
-                                print "ADA 2"
+                                if self.verbosity:
+                                    print "ADA 2"
                                 self.parserlog(f1)
                                 time.sleep(int(roundtime))
                             if len(filelog1) < 2 and len(filelog2) > 0:
                                 #print "f2 = ", f2
                                 self.parserlog_ftp(f2)
-                                print "ADA 3"
+                                if self.verbosity:
+                                    print "ADA 3"
                                 time.sleep(int(roundtime))
                             else:
-                                print "TIDAK ADA 1"
+                                if self.verbosity:
+                                    print "TIDAK ADA 1"
                                 time.sleep(int(roundtime))
                         else:
                             if len(filelog1) > 0:
-                                print "ADA 1A"
+                                if self.verbosity:
+                                    print "ADA 1A"
                                 self.parserlog(f1)
                                 #self.parserlog_ftp(f2)
                                 time.sleep(int(roundtime))
                             else:
-                                print "TIDAK ADA 1A"
+                                if self.verbosity:
+                                    print "TIDAK ADA 1A"
                                 time.sleep(int(roundtime))
 
             elif f1 != None and f2 == None:
@@ -572,20 +622,24 @@ class parser(object):
                         filelog2 = open(f2).readlines()
 
                     if len(filelog1) > 1 and len(filelog2) > 1:
-                        print "ADA 4"
+                        if self.verbosity:
+                            print "ADA 4"
                         self.parserlog(f1)
                         self.parserlog_ftp(f2)
                         time.sleep(int(roundtime))
                     elif len(filelog1) > 1 and len(filelog2) < 2:
-                        print "ADA 5"
+                        if self.verbosity:
+                            print "ADA 5"
                         self.parserlog(f1)
                         time.sleep(int(roundtime))
                     if len(filelog1) < 2 and len(filelog2) > 1:
-                        print "ADA 6"
+                        if self.verbosity:
+                            print "ADA 6"
                         self.parserlog_ftp(f2)
                         time.sleep(int(roundtime))
                     else:
-                        print "TIDAK ADA 2"
+                        if self.verbosity:
+                            print "TIDAK ADA 2"
             elif f1 == None and f2 != None:
                 while 1:
                     f1 = filenamelog
@@ -598,20 +652,24 @@ class parser(object):
                         filelog2 = open(f2).readlines()
 
                     if len(filelog1) > 1 and len(filelog2) > 1:
-                        print "ADA 7"
+                        if self.verbosity:
+                            print "ADA 7"
                         self.parserlog(f1)
                         self.parserlog_ftp(f2)
                         time.sleep(int(roundtime))
                     elif len(filelog1) > 1 and len(filelog2) < 2:
-                        print "ADA 8"
+                        if self.verbosity:
+                            print "ADA 8"
                         self.parser_error(f1)
                         time.sleep(int(roundtime))
                     if len(filelog1) < 2 and len(filelog2) > 1:
-                        print "ADA 9"
+                        if self.verbosity:
+                            print "ADA 9"
                         self.parserlog_ftp(f2)
                         time.sleep(int(roundtime))
                     else:
-                        print "TIDAK ADA 3"
+                        if self.verbosity:
+                            print "TIDAK ADA 3"
             else:
                 while 1:
                     while self.cekfile(f1) == False:
@@ -623,26 +681,31 @@ class parser(object):
                         filelog2 = open(f2).readlines()
 
                     if len(filelog1) > 1 and len(filelog2) > 1:
-                        print "ADA 10"
+                        if self.verbosity:
+                            print "ADA 10"
                         self.parserlog(f1)
                         self.parserlog_ftp(f2)
                         time.sleep(int(roundtime))
                     elif len(filelog1) > 1 and len(filelog2) < 2:
-                        print "ADA 11"
+                        if self.verbosity:
+                            print "ADA 11"
                         self.parser_error(f1)
                         time.sleep(int(roundtime))
                     if len(filelog1) < 2 and len(filelog2) > 1:
-                        print "ADA 12"
+                        if self.verbosity:
+                            print "ADA 12"
                         self.parserlog_ftp(f2)
                         time.sleep(int(roundtime))
                     else:
-                        print "TIDAK ADA 4"
+                        if self.verbosity:
+                            print "TIDAK ADA 4"
         except:
             datae = traceback.format_exc()
             msg = str(os.path.splitext(os.path.basename(str(__file__)))[0]) + " " + str(datae)
-            syslog.syslog(msg, 3,3,host,514)
+            syslog.syslog(msg, 3,3,IP_SYSLOG_SERVER,PORT_SYSLOG_SERVER)
             sender.main(msg)
-            print "Error Script = ", msg
+            if self.verbosity:
+                print "Error Script = ", msg
             pass  
         
     def runA(self):
@@ -662,8 +725,9 @@ class parser(object):
             data = open(f).readlines()
         if os.path.isfile(f):
             if len(data) > 0:
-                print "len f = ", len(data)
-                print "ADA 1" 
+                if self.verbosity:
+                    print "len f = ", len(data)
+                    print "ADA 1" 
                 #sender.main("Totalcmd Log Monitor : Processing Data Log !")
                 self.parserlog(f)
                 time.sleep(int(f_time))
@@ -693,11 +757,13 @@ class parser(object):
             time.sleep(5)
             data = open(f).readlines()
         if len(data) > 0:
-            print "ADA 2"
+            if self.verbosity:
+                print "ADA 2"
             self.runA()
         else:
             time.sleep(int(f_time))
-            print "TIDAK ADA"
+            if self.verbosity:
+                print "TIDAK ADA"
             self.runA() 
         #except:
         #   datae = traceback.format_exc()

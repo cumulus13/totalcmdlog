@@ -19,9 +19,7 @@ class Config_Form(QtGui.QMainWindow):
     #closed = QtCore.pyqtSignal()
     def __init__(self, parent=None):
         super(Config_Form, self).__init__(parent)
-        self.parent = parent
-    #def setupUi(self, self):
-    
+        
         self.setObjectName(_fromUtf8("Form"))
         self.setFixedSize(472, 425)
         self.lineEdit = QtGui.QLineEdit(self)
@@ -56,7 +54,7 @@ class Config_Form(QtGui.QMainWindow):
         self.textEdit_datalog.setGeometry(QtCore.QRect(110, 60, 351, 65))
         self.textEdit_datalog.setObjectName(_fromUtf8("textEdit_datalog"))
         self.label_seconds = QtGui.QLabel(self)
-        self.label_seconds.setGeometry(QtCore.QRect(170, 30, 46, 13))
+        self.label_seconds.setGeometry(QtCore.QRect(170, 30, 50, 13))
         self.label_seconds.setObjectName(_fromUtf8("label_seconds"))
         self.label_timeround = QtGui.QLabel(self)
         self.label_timeround.setGeometry(QtCore.QRect(20, 30, 81, 16))
@@ -104,6 +102,22 @@ class Config_Form(QtGui.QMainWindow):
         
         self.setcenter()
         self.read_config()
+        
+    def sethtml(self, title, fontsize="9", fontweight="600"):
+        htmlconf =  "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n" + "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n" +  "p, li { white-space: pre-wrap; }\n" + "</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n" + "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:%spt; font-weight:%s;\">%s : </span></p></body></html>" % (fontsize, fontweight, title)
+        return htmlconf
+    
+    def setNote(self, note, fontsize=8, style="italic", color="#660101", weight=400, tag=None):
+        head = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n" + "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n" + "p, li { white-space: pre-wrap; }\n" + "</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
+        htmlconf2 = "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:%s pt; font-style:%s; font-weight:%s; color:%s;\">%s</span></p>\n" + "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:%s pt; font-style:%s; color:%s;\"></p>\n" %(str(fontsize), str(style), str(weight), str(color), str(note), str(fontsize), str(style), str(color))
+        print "htmlconf = ",  htmlconf2
+        closed = "</body></html>"
+        if tag == "head":
+            return head + htmlconf2
+        elif tag == "closed":
+            return htmlconf2 + closed
+        else:
+            return htmlconf2
     
     def setcenter(self):
         screen = QtGui.QDesktopWidget().screenGeometry()
@@ -111,61 +125,17 @@ class Config_Form(QtGui.QMainWindow):
         self.move((screen.width() - self.width())/2, (screen.height() - self.height())/6)
 
     def retranslateUi(self):
-        self.setWindowTitle(QtGui.QApplication.translate("Form", "Form", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_seconds.setText(QtGui.QApplication.translate("Form", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt; font-weight:600;\">Seconds</span></p></body></html>", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_timeround.setText(QtGui.QApplication.translate("Form", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt; font-weight:600;\">Time Round : </span></p></body></html>", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_table.setText(QtGui.QApplication.translate("Form", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt; font-weight:600;\">Table : </span></p></body></html>", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_datalog.setText(QtGui.QApplication.translate("Form", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt; font-weight:600;\">Log File : </span></p></body></html>", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_host.setText(QtGui.QApplication.translate("Form", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt; font-weight:600;\">Host : </span></p></body></html>", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_port.setText(QtGui.QApplication.translate("Form", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt; font-weight:600;\">Port : </span></p></body></html>", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_username.setText(QtGui.QApplication.translate("Form", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt; font-weight:600;\">Username : </span></p></body></html>", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_password.setText(QtGui.QApplication.translate("Form", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt; font-weight:600;\">Password : </span></p></body></html>", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_database.setText(QtGui.QApplication.translate("Form", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:9pt; font-weight:600;\">Database : </span></p></body></html>", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_info.setText(QtGui.QApplication.translate("Form", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
-"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
-"p, li { white-space: pre-wrap; }\n"
-"</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt; font-style:italic; color:#660101;\">Time Round is Time  long for repeat task before its.</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt; font-style:italic; color:#660101;\"></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt; font-style:italic; color:#660101;\">Access Log is Place of File Access Log Apache</span></p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt; font-style:italic; color:#660101;\"></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:8pt; font-style:italic; color:#660101;\">Error Log is Place of File Error Log Apache</span></p></body></html>", None, QtGui.QApplication.UnicodeUTF8))
+        self.setWindowTitle(QtGui.QApplication.translate("Form", "Setting - Configuration", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_seconds.setText(QtGui.QApplication.translate("Form", self.sethtml("Seconds", 8), None, QtGui.QApplication.UnicodeUTF8))
+        self.label_timeround.setText(QtGui.QApplication.translate("Form", self.sethtml("Time Round", 9), None, QtGui.QApplication.UnicodeUTF8))
+        self.label_table.setText(QtGui.QApplication.translate("Form", self.sethtml("Table", 9), None, QtGui.QApplication.UnicodeUTF8))
+        self.label_datalog.setText(QtGui.QApplication.translate("Form", self.sethtml("Log File", 9), None, QtGui.QApplication.UnicodeUTF8))
+        self.label_host.setText(QtGui.QApplication.translate("Form", self.sethtml("Host", 9), None, QtGui.QApplication.UnicodeUTF8))
+        self.label_port.setText(QtGui.QApplication.translate("Form", self.sethtml("Port", 9), None, QtGui.QApplication.UnicodeUTF8))
+        self.label_username.setText(QtGui.QApplication.translate("Form", self.sethtml("Username", 9), None, QtGui.QApplication.UnicodeUTF8))
+        self.label_password.setText(QtGui.QApplication.translate("Form", self.sethtml("Password", 9), None, QtGui.QApplication.UnicodeUTF8))
+        self.label_database.setText(QtGui.QApplication.translate("Form", self.sethtml("Database", 9), None, QtGui.QApplication.UnicodeUTF8))
+        self.label_info.setText(QtGui.QApplication.translate("Form", self.setNote("Time Round is Time  long for repeat task before its.", tag="head") + self.setNote("Access Log is Place of File Access Log Apache") + self.setNote("Error Log is Place of File Error Log Apache", tag="closed"), None, QtGui.QApplication.UnicodeUTF8))
         self.pushButton.setText(QtGui.QApplication.translate("Form", "Cancel", None, QtGui.QApplication.UnicodeUTF8))
         self.pushButton_2.setText(QtGui.QApplication.translate("Form", "OK", None, QtGui.QApplication.UnicodeUTF8))
         self.pushButton_2.connect(self.pushButton_2, QtCore.SIGNAL('clicked()'), self.write_config)
@@ -223,7 +193,7 @@ class Config_Form(QtGui.QMainWindow):
         #import sys
         #sys.exit()
 
-"""
+
 if __name__ == "__main__":
     import sys
     app = QtGui.QApplication(sys.argv)
@@ -232,4 +202,4 @@ if __name__ == "__main__":
     #ui.setupUi(self)
     ui.show()
     sys.exit(app.exec_())
-"""
+

@@ -10,7 +10,7 @@ TMP = os.getenv('TMP')
 #this_temp = os.path.join(parent_dir,'temp')
 os.environ.update({'TOTALCMDLOG':os.path.dirname(__file__)})
 
-f = os.path.join(os.environ.get('TOTALCMDLOG'), 'conf.ini')
+f = os.path.join(os.environ.get('TOTALCMDLOG'), 'totalcmdlog.ini')
 #print "F = ", f
 cfg = configfile.Config(f)
 #print "cfg = ", cfg

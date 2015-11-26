@@ -1,0 +1,7 @@
+__version__  = "0.1"
+__test__     = "0.4"
+__sdk__      = "2.7"
+__author__   = "LICFACE"
+__email__    = "licface@yahoo.com"
+__platform__ = "all"
+__build__    = "2.7"

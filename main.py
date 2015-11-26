@@ -29,165 +29,20 @@ class Window(QtGui.QWidget):
                        [name] VARCHAR(255) NOT NULL,
                        [addinfo] VARCHAR(255) NOT NULL)'''
 
-        #self.conn = sqlite.connect(os.environ['TEMP'] + '\\' + 'dtemp.db')
-        self.conn = sqlite.connect('dtemp.db')
+        self.conn = sqlite.connect('totalcmd_dtemp.db')
         self.curs = self.conn.cursor()
         self.process = QtCore.QProcess()
-
-        #self.createIconGroupBox()
-        #self.createMessageGroupBox()
-
-        #self.iconLabel.setMinimumWidth(self.durationLabel.sizeHint().width())
 
         self.createActions()
         self.createTrayIcon()
         self.setIcon()
-
-        #QtCore.QObject.connect(self.showMessageButton,
-        #        QtCore.SIGNAL("clicked()"), self.showMessage)
-        #QtCore.QObject.connect(self.showIconCheckBox,
-        #        QtCore.SIGNAL("toggled(bool)"), self.trayIcon,
-        #        QtCore.SLOT("setVisible(bool)"))
-        #QtCore.QObject.connect(self.iconComboBox,
-        #        QtCore.SIGNAL("currentIndexChanged(int)"), self.setIcon)
-        #QtCore.QObject.connect(self.trayIcon,
-        #        QtCore.SIGNAL("messageClicked()"), self.messageClicked)
-        #QtCore.QObject.connect(self.trayIcon,
-        #        QtCore.SIGNAL("activated(QSystemTrayIcon::ActivationReason)"),
-        #        self.iconActivated)
-
-        #mainLayout = QtGui.QVBoxLayout()
-        #mainLayout.addWidget(self.iconGroupBox)
-        #mainLayout.addWidget(self.messageGroupBox)
-        #self.setLayout(mainLayout)
-
-        #self.iconComboBox.setCurrentIndex(1)
         self.trayIcon.show()
-
-        #self.setWindowTitle(self.tr("Systray"))
-        #self.resize(400, 300)
-
-    #def setVisible(self, visible):
-    #    self.minimizeAction.setEnabled(visible)
-    #    self.maximizeAction.setEnabled(not self.isMaximized())
-    #    self.restoreAction.setEnabled(self.isMaximized() or not visible)
-    #    QtGui.QWidget.setVisible(self, visible)
-
-    #def closeEvent(self, event):
-    #    if self.trayIcon.isVisible():
-    #        QtGui.QMessageBox.information(self, self.tr("Systray"),
-    #                self.tr("The program will keep running in the system "
-    #                    "tray. To terminate the program, choose <b>Quit</b> "
-    #                    "in the context menu of the system tray entry."))
-    #        self.hide()
-    #        event.ignore()
 
     def setIcon(self, index=0):
         #icon = self.iconComboBox.itemIcon(index)
         icon = QtGui.QIcon("images/totalcmd.png")
         self.trayIcon.setIcon(icon)
         self.setWindowIcon(icon)
-
-        #self.trayIcon.setToolTip(self.iconComboBox.itemText(index))
-
-    #def iconActivated(self, reason):
-    #    if reason == QtGui.QSystemTrayIcon.Trigger \
-    #            or reason == QtGui.QSystemTrayIcon.DoubleClick:
-    #        self.iconComboBox.setCurrentIndex(
-    #                (self.iconComboBox.currentIndex() + 1)
-    #                % self.iconComboBox.count())
-    #    elif reason == QtGui.QSystemTrayIcon.MiddleClick:
-    #        self.showMessage()
-
-    #def showMessage(self):
-    #    icon = QtGui.QSystemTrayIcon.MessageIcon(
-    #         self.typeComboBox.itemData(
-    #             self.typeComboBox.currentIndex()).toInt()[0])
-    #    self.trayIcon.showMessage(self.titleEdit.text(),
-    #            self.bodyEdit.toPlainText(), icon,
-    #            self.durationSpinBox.value() * 1000)
-
-    #def messageClicked(self):
-    #    QtGui.QMessageBox.information(None, self.tr("Systray"),
-    #            self.tr("Sorry, I already gave what help I could.\nMaybe you "
-    #                "should try asking a human?"))
-
-    #def createIconGroupBox(self):
-    #    self.iconGroupBox = QtGui.QGroupBox(self.tr("Tray Icon"))
-
-    #    self.iconLabel = QtGui.QLabel("Icon:")
-
-    #    self.iconComboBox = QtGui.QComboBox()
-    #    self.iconComboBox.addItem(QtGui.QIcon("LifeJack.jpg"),
-    #            self.tr("Bad"))
-
-    #    self.showIconCheckBox = QtGui.QCheckBox(self.tr("Show icon"))
-    #    self.showIconCheckBox.setChecked(True)
-
-    #    iconLayout = QtGui.QHBoxLayout()
-    #    iconLayout.addWidget(self.iconLabel)
-    #    iconLayout.addWidget(self.iconComboBox)
-    #    iconLayout.addStretch()
-    #    iconLayout.addWidget(self.showIconCheckBox)
-    #    self.iconGroupBox.setLayout(iconLayout)
-
-    #def createMessageGroupBox(self):
-    #    self.messageGroupBox = QtGui.QGroupBox(self.tr("Balloon Message"))
-
-    #    self.typeLabel = QtGui.QLabel(self.tr("Type:"))
-
-    #    self.typeComboBox = QtGui.QComboBox()
-    #    self.typeComboBox.addItem(self.tr("None"),
-    #            QtCore.QVariant(QtGui.QSystemTrayIcon.NoIcon))
-    #    self.typeComboBox.addItem(self.style().standardIcon(
-    #            QtGui.QStyle.SP_MessageBoxInformation), self.tr("Information"),
-    #            QtCore.QVariant(QtGui.QSystemTrayIcon.Information))
-    #    self.typeComboBox.addItem(self.style().standardIcon(
-    #            QtGui.QStyle.SP_MessageBoxWarning), self.tr("Warning"),
-    #            QtCore.QVariant(QtGui.QSystemTrayIcon.Warning))
-    #    self.typeComboBox.addItem(self.style().standardIcon(
-    #            QtGui.QStyle.SP_MessageBoxCritical), self.tr("Critical"),
-    #            QtCore.QVariant(QtGui.QSystemTrayIcon.Critical))
-    #    self.typeComboBox.setCurrentIndex(1)
-
-    #    self.durationLabel = QtGui.QLabel(self.tr("Duration:"))
-
-    #    self.durationSpinBox = QtGui.QSpinBox()
-    #    self.durationSpinBox.setRange(5, 60)
-    #    self.durationSpinBox.setSuffix(" s")
-    #    self.durationSpinBox.setValue(15)
-
-    #    self.durationWarningLabel = QtGui.QLabel(self.tr("(some systems might "
-        #           "ignore this hint)"))
-    #    self.durationWarningLabel.setIndent(10)
-
-    #    self.titleLabel = QtGui.QLabel(self.tr("Title:"))
-
-    #    self.titleEdit = QtGui.QLineEdit(self.tr("Cannot connect to network"))
-
-    #    self.bodyLabel = QtGui.QLabel(self.tr("Body:"))
-
-    #    self.bodyEdit = QtGui.QTextEdit()
-    #    self.bodyEdit.setPlainText(self.tr("Don't believe me. Honestly, I "
-    #            "don't have a clue.\nClick this balloon for details."))
-
-    #    self.showMessageButton = QtGui.QPushButton(self.tr("Show Message"))
-    #    self.showMessageButton.setDefault(True)
-
-    #    messageLayout = QtGui.QGridLayout()
-    #    messageLayout.addWidget(self.typeLabel, 0, 0)
-    #    messageLayout.addWidget(self.typeComboBox, 0, 1, 1, 2)
-    #    messageLayout.addWidget(self.durationLabel, 1, 0)
-    #    messageLayout.addWidget(self.durationSpinBox, 1, 1)
-    #    messageLayout.addWidget(self.durationWarningLabel, 1, 2, 1, 3)
-    #    messageLayout.addWidget(self.titleLabel, 2, 0)
-    #    messageLayout.addWidget(self.titleEdit, 2, 1, 1, 4)
-    #    messageLayout.addWidget(self.bodyLabel, 3, 0)
-    #    messageLayout.addWidget(self.bodyEdit, 3, 1, 2, 4)
-    #    messageLayout.addWidget(self.showMessageButton, 5, 4)
-    #    messageLayout.setColumnStretch(3, 1)
-    #    messageLayout.setRowStretch(4, 1)
-    #    self.messageGroupBox.setLayout(messageLayout)
 
     def createActions(self):
 
@@ -302,6 +157,26 @@ class Window(QtGui.QWidget):
                     self.conn.commit()
                 elif "IOError" in datagram:
                     self.statusText = "Restart Server  ....."
+                    try:
+                        self.stop()
+                    except:
+                        pass
+                    self.start_server()
+                    self._showMsg("Restart Server .....")
+                elif "OperationalError" in datagram:
+                    self.statusText = "Restart Server  ....."
+                    try:
+                        self.stop()
+                    except:
+                        pass
+                    self.start_server()
+                    self._showMsg("Restart Server .....")
+                elif "SystemExit" in datagram:
+                    self.statusText = "Restart Server  ....."
+                    try:
+                        self.stop()
+                    except:
+                        pass
                     self.start_server()
                     self._showMsg("Restart Server .....")
 
@@ -309,39 +184,7 @@ class Window(QtGui.QWidget):
         except:
             datae = traceback.format_exc()
             print " Error = ", str(datae)
-    """
-    def runA(self):
-        f = self.dataconf.setting[0].errorlog
-        f_time = self.dataconf.setting[0].roundtime
-        data = open(f).readlines()
-        if os.path.isfile(f):
-            if len(data) > 2:
-                print "len f = ", len(data)
-                print "ADA 1"
-                self._parser.parser_error(f)
-                time.sleep(int(f_time))
-                self.runB()
-            else:
-                #time.sleep(int(f_time))
-                self.runB()
-        else:
-            msg = "Can't Found Log File ! "
-            self._showMsg(msg)
-            #sys.exit()
-            self.runB()
-
-    def runB(self):
-        f = self.dataconf.setting[0].errorlog
-        f_time = self.dataconf.setting[0].roundtime
-        data = open(f).readlines()
-        if len(data) > 2:
-            print "ADA 2"
-            self.runA()
-        else:
-            time.sleep(int(f_time))
-            print "TIDAK ADA"
-            self.runA()
-    """        
+        
     def runC(self):
         os.startfile("parserlog.pyw")
 
@@ -357,10 +200,11 @@ class Window(QtGui.QWidget):
             self.conn.commit()
             data = self.curs.fetchall()
             print "data pid = ", data
-            pid = int((data[0][0]))
-            print "data pid 2 = ", pid
-            controll_stop.kill_4(int(pid))
-            self._showMsg("Kill Process with pid = " + str(pid))
+            if pid != []:
+                pid = int((data[0][0]))
+                print "data pid 2 = ", pid
+                controll_stop.kill_4(int(pid))
+                self._showMsg("Kill Process with pid = " + str(pid))
             self.statusText = "Stopped"
         except:
             datae = traceback.format_exc()
@@ -371,7 +215,7 @@ class Window(QtGui.QWidget):
             return
 
     def start(self):
-        a = subprocess.Popen(r'c:\Python26\python.exe ' + ' ' + str(os.path.join(os.getcwd(), 'apachelogparser.py')))
+        a = subprocess.Popen(self.dataconf.setting[0].python + ' ' + str(os.path.join(os.getcwd(), 'parserlog.py')))
         self._showMsg(str(a.pid))
         return a.pid
 
@@ -389,16 +233,27 @@ class Window(QtGui.QWidget):
 
     def startCommand(self):
         try:
-            self.process.start(r"c:\Python26\python.exe", QtCore.QStringList(["parserlog.py"]))
-            #self._showMsg(str(self.process.pid()))
-            #return self.process.pid()
+            print "Parser Running ...."
+            maxid = self.getmax_id()
+            if maxid == 0 or maxid == None:
+                maxid = 1
+            else:
+                maxid = maxid + 1
+            infoadd = ""
+            print "self.dataconf.setting[0].python =",self.dataconf.setting[0].python
+            self.process.start(self.dataconf.setting[0].python, QtCore.QStringList(["parserlog.py"]))
+            self._showMsg("Parser Running: " + str(self.process.pid()))
+            SQL = "INSERT INTO datatemp VALUES(" + str(maxid) + ",\"" + str(self.process.pid()) + "\",\" parserlog.py \",\"" + str(infoadd) + "\")"  
+            self.curs.execute(SQL)
+            self.conn.commit()
+            return self.process.pid()
         except:
             self._showMsg(QtGui.QString(self.process.readLineStderr()))
 
     def stopCommand(self):
         try:
-            self.process.start(r"c:\Python26\python.exe", QtCore.QStringList(["parserlog.py"]))
-            self._showMsg(self.process.pid())
+            self.process.start(self.dataconf.setting[0].python, QtCore.QStringList(["parserlog.py"]))
+            self._showMsg("Parser Stopping: " + str(self.process.pid()))
             return self.process.pid()
         except:
             self._showMsg(QtGui.QString(self.process.readLineStderr()))
